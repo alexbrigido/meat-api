@@ -1,19 +1,11 @@
-import * as restify from 'restify'
+import {Server} from './server/server'
 
 
-// create the server
-const server = restify.createServer({
-    name: 'meat-api',
-    version: '1.0.0'
-})
-
-// register the URL router (endpoint)
-server.get('/hello', (req, respo, next)=>{
-    respo.json({message: 'hello'})
-    return next()
-})
-
-// enable server listen on port 3000
-server.listen(3000, ()=>{
-    console.log('API is running on http://localhost:3000')
+const server = new Server()
+server.bootstrap().then(server=>{
+    console.log('Server is listenin on :', server.application.address() )
+}).catch(error=>{
+    console.log('Server failed to start')
+    console.error(error)
+    process.exit(1)
 })
