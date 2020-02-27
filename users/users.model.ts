@@ -1,22 +1,18 @@
+import * as mongoose from  'mongoose'
+import { usersRouter } from './users.router'
 
-const users = [
-    {id: '1', name: 'Peter Parker', email: 'peter@marvel.com'},
-    {id: '2', name: 'Bruce Wayne', email: 'bruce@dc.com'}
-]
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String
+    },
+    email: {
+        type: String,
+        unique: true
+    },
+    password: {
+        type: String,
+        select: false
+    }
+})
 
-export class User {
-    static findAll(): Promise<any[]>{
-        return Promise.resolve(users)
-    }
-    
-    static findById(id:string): Promise<any> {
-        return new Promise(resolve=>{
-            const filtered = users.filter(user => user.id === id)
-            let user = undefined
-            if(filtered.length > 0) {
-                user = filtered
-            }
-            resolve(user)
-        })
-    }
-}
+export const User = mongoose.model('User', userSchema)
