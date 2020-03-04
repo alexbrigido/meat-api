@@ -3,47 +3,35 @@ import * as restify from 'restify'
 import {User} from './users.model'
 
 class UsersRouter extends Router {
+
+    constructor() {
+        super()
+        this.on('beforeRender', document=>{
+            document.password = undefined
+            // delete document.password
+        })
+    }
+
     applyRooutes(application: restify.Server){
 
         application.get('/users', (req, resp, next)=>{
-            User.find().then(users=>{
-                resp.json(users)
-                return next()
-            })            
+            User.find().then(this.render(resp, next))            
         })
 
         application.get('users/:id', (req, resp, next)=>{
-            User.findById(req.params.id).then(user=>{
-                if(user){
-                    resp.json(user)
-                    return next()
-                }
-                resp.send(404)
-                return next()
-            })
+            User.findById(req.params.id).then(this.render(resp, next))
         })
 
         application.post('/users', (req, resp, next)=>{
             let user = new User(req.body)
-            user.save().then(user=>{
-                user.password = undefined
-                resp.json(user)
-                return next()
-            })
+            user.save().then(this.render(resp, next))
         })
 
         application.put('/users/:id', (req, resp, next)=>{
             const options = {new: true}
             User.findByIdAndUpdate(req.params.id, req.body, options)
-                .then(user=>{
-                    if(user) {
-                        resp.json(user)
-                        return next()
-                    }else {
-                        resp.send(404)
-                        return next()
-                    }
-                }).catch(error=>{
+                .then(this.render(resp, next))
+                .catch(error=>{
                     resp.send(error)
                     return next()
                 })
@@ -52,15 +40,8 @@ class UsersRouter extends Router {
         application.patch('/users/:id', (req, resp, next)=>{
             const options = {new: true}
             User.findByIdAndUpdate(req.params.id, req.body, options)
-                .then(user=>{
-                    if(user) {
-                        resp.json(user)
-                        return next()
-                    }else {
-                        resp.send(404)
-                        return next()
-                    }
-                }).catch(error=>{
+                .then(this.render(resp, next))
+                .catch(error=>{
                     resp.send(error)
                     return next()
                 })
